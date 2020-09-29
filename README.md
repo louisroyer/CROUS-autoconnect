@@ -21,8 +21,8 @@ Vous pouvez créer un script avec Network Manager pour automatiser la connexion.
 5. Créer `/etc/NetworkManager/dispatcher.d/10-script.sh` contenant :
 ```bash
 #!/usr/bin/env bash
-# Vos identifiants à remplacer ci-dessous
 set -e
+# Vos identifiants à remplacer ci-dessous
 LOGIN='<LOGIN>'
 PASSWORD='<PASSWORD>'
 UUID='<UUID>'
