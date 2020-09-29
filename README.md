@@ -23,12 +23,12 @@ Vous pouvez créer un script avec Network Manager pour automatiser la connexion.
 ```bash
 #!/usr/bin/env bash
 # Vos identifiants à remplacer ci-dessous
-local LOGIN='<LOGIN>'
-local PASSWORD='<PASSWORD>'
-local UUID='<UUID>'
+LOGIN='<LOGIN>'
+PASSWORD='<PASSWORD>'
+UUID='<UUID>'
 
 # début du script
-local status=$2
+status=$2
 if [ "$CONNECTION_UUID" = $UUID ]; then
 	case $status in
 		up)
@@ -40,8 +40,4 @@ if [ "$CONNECTION_UUID" = $UUID ]; then
 fi
 ```
 6. S’assurer que LOGIN, PASSWORD et UUID ont bien configurés.
-7. S’assurer que les droits sont corrects:
-```bash
-chown root:root -R /etc/NetworkManager/scripts /etc/NetworkManager/dispatcher.d
-chmod 700 -R /etc/NetworkManager/scripts /etc/NetworkManager/dispatcher.d
-```
+7. S’assurer que les droits sont corrects (tout doit appartenir à root et les autres utilisateurs ne doivent avoir aucun droit), `/etc/NetworkManager/dispatcher.d/10-script.sh` doit être exécutable).
