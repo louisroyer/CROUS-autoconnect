@@ -1,14 +1,12 @@
-#!/usr/bin/env python
-# coding: utf-8
+#!/usr/bin/env python3
+
 """
     A python script allowing Students at UPS to connect easily to the campus WIFI.
 """
 
 import requests
-
-LOGIN = "LOGIN"
-PASSWORD = "Pass"
-
+import syslog
+import sys
 
 def try_access_point(i):
     """
@@ -16,7 +14,7 @@ def try_access_point(i):
         Retourne l'url du point d'accès si celui si est disponible.
     """
 
-    url = 'https://pfrf0${i}.in.crous-toulouse.fr:8003/index.php?zone=lan'
+    url = f'https://pftf0{i}.in.crous-toulouse.fr:8003/index.php?zone=lan'
     try:
         requests.post(url)
         return url
@@ -26,7 +24,7 @@ def try_access_point(i):
 
 def try_all_access_point():
     """
-        Essaye de se connecter a tous les points d'accès du campus.
+        Essaye de se connecter à tous les points d'accès du campus.
         Retourne le premier point d'accès disponible.
     """
 
@@ -38,15 +36,15 @@ def try_all_access_point():
     return url
 
 
-def connect(url):
+def connect(url, login, password):
     """
         Connection via une URL valide
     """
 
-    print('Url used : {url}')
+    syslog.syslog(syslog.LOG_INFO, f"Connection to {url}…")
 
     data = {
-        "auth_user": LOGIN, "auth_pass": PASSWORD,
+        "auth_user": login, "auth_pass": password,
         "redirurl": "http://www.crous-toulouse.fr/",
         "accept": "Continue"
     }
@@ -59,17 +57,23 @@ def connect(url):
     res = requests.post(url, data=data, headers=headers)
 
     if res.content == b'You are connected.':
-        input("Déjà Connecté")
+        syslog.syslog(syslog.LOG_INFO, "You are already connected.")
     elif b'Erreur d\'Authentification !' in res.content[:224]:
-        input("Mauvais Identifiants")
+        syslog.syslog(syslog.LOG_ERR, "Wrong credentials.")
+        exit(2)
     elif b'Redir' in res.content[:50]:
-        input("Connecté !")
+        syslog.syslog(syslog.LOG_INFO, "Connected.")
 
 
 if __name__ == '__main__':
+    syslog.openlog("CROUS-autoconnect")
+    if len(sys.argv) != 3:
+        syslog.syslog(syslog.LOG_ERR, "Credentials not provided.")
+        exit(1)
+    login = sys.argv[0]
+    password = sys.argv[1]
     url = try_all_access_point()
     if url is None:
-        input("Impossible de se connecter !")
-        exit(1)
-    else:
-        connect(url)
+        syslog.syslog(syslog.LOG_ERR, "No captive portal detected.")
+        exit(3)
+    connect(url, login, password)
