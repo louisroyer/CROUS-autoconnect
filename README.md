@@ -1,11 +1,9 @@
 # CROUS-autoconnect
-Connecte automatiquement aux réseau du CROUS si les bons identifiants sont donnés.
+Connecte automatiquement au portail captif du CROUS.
 
 ## Dépendances
-[Python 3](https://www.python.org/downloads) doit être installé, ainsi que le module [`requests`](https://pypi.org/project/requests), installable par la commande `pip install requests` dans un terminal si [`pip`](https://pip.pypa.io/en/stable/installing) est installé ou bien par apt si vous êtes sous linux :
-
 ```bash
-# apt install python3-requests
+apt install python3 python3-requests
 ```
 
 ## Usage
@@ -15,14 +13,16 @@ Connecte automatiquement aux réseau du CROUS si les bons identifiants sont donn
 
 ### Automatisation de la connexion avec Network Manager
 Vous pouvez créer un script avec Network Manager pour automatiser la connexion.
+0. Pour être sûr de créer les fichiers avec les bons droits: `sudo su - && umask 077`
 1. `mkdir -p /etc/NetworkManager/scripts`
-2. Clonner le dépôt dans `/etc/NetworkManager/scripts/CROUS-autoconnect`
+2. Cloner le dépôt: `cd /etc/NetworkManager/scripts/ && git clone https://github.com/louisroyer/CROUS-autoconnect.git`
 3. Activer le service: `systemctl enable NetworkManager-dispatcher.service`
 4. Trouver l’UUID de la connexion avec `nmcli connection`.
 5. Créer `/etc/NetworkManager/dispatcher.d/10-script.sh` contenant :
 ```bash
 #!/usr/bin/env bash
 # Vos identifiants à remplacer ci-dessous
+set -e
 LOGIN='<LOGIN>'
 PASSWORD='<PASSWORD>'
 UUID='<UUID>'
@@ -39,5 +39,5 @@ if [ "$CONNECTION_UUID" = $UUID ]; then
 	esac
 fi
 ```
-6. S’assurer que LOGIN, PASSWORD et UUID ont bien configurés.
-7. S’assurer que les droits sont corrects (tout doit appartenir à root et les autres utilisateurs ne doivent avoir aucun droit), `/etc/NetworkManager/dispatcher.d/10-script.sh` doit être exécutable).
+6. S’assurer que `LOGIN`, `PASSWORD` et `UUID` ont bien configurés.
+7. `chmod +x /etc/NetworkManager/dispatcher.d/10-script.sh`
