@@ -45,7 +45,7 @@ def connect(url, login, password):
 
     data = {
         "auth_user": login, "auth_pass": password,
-        "redirurl": "http://www.crous-toulouse.fr/",
+        "redirurl": "http://www.crous-toulouse.fr",
         "accept": "Continue"
     }
 
@@ -70,8 +70,8 @@ if __name__ == '__main__':
     if len(sys.argv) != 3:
         syslog.syslog(syslog.LOG_ERR, "Credentials not provided.")
         exit(1)
-    login = sys.argv[0]
-    password = sys.argv[1]
+    login = sys.argv[1]
+    password = sys.argv[2]
     url = try_all_access_point()
     if url is None:
         syslog.syslog(syslog.LOG_ERR, "No captive portal detected.")
